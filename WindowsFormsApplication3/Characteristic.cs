@@ -21,8 +21,8 @@ namespace WindowsFormsApplication3
         internal string parType;
         internal int parDecNum;
         internal string parUnit;
-        internal int parMin;
-        internal int parMax;
+        internal string parMin;
+        internal string parMax;
         internal int parKa;
         internal int parKb;
         internal int parKc;
@@ -45,8 +45,8 @@ namespace WindowsFormsApplication3
             parType = "";
             parDecNum = 0;
             parUnit = "";
-            parMin = 0;
-            parMax = 0;
+            parMin = "";
+            parMax = "";
             parKa = 1;
             parKb = 0;
             parKc = 0;
@@ -79,8 +79,8 @@ namespace WindowsFormsApplication3
                 parType = ws.get_Range("C" + Line, "C" + Line).Value2.ToString();
                 parDecNum = Convert.ToInt32(ws.get_Range("D" + Line, "D" + Line).Value2.ToString());
                 parUnit = ws.get_Range("E" + Line, "E" + Line).Value2.ToString();
-                parMin = Convert.ToInt32(ws.get_Range("F" + Line, "F" + Line).Value2.ToString());
-                parMax = Convert.ToInt32(ws.get_Range("G" + Line, "G" + Line).Value2.ToString());
+                parMin = ws.get_Range("F" + Line, "F" + Line).Value2.ToString();
+                parMax = ws.get_Range("G" + Line, "G" + Line).Value2.ToString();
                 parKa = Convert.ToInt32(ws.get_Range("H" + Line, "H" + Line).Value2.ToString());
                 parKb = Convert.ToInt32(ws.get_Range("I" + Line, "I" + Line).Value2.ToString());
                 parKc = Convert.ToInt32(ws.get_Range("J" + Line, "J" + Line).Value2.ToString());
@@ -88,7 +88,14 @@ namespace WindowsFormsApplication3
                 parKk = Convert.ToInt32(ws.get_Range("L" + Line, "L" + Line).Value2.ToString());
                 parAlias = ws.get_Range("M" + Line, "M" + Line).Value2.ToString();
                 parDescription = ws.get_Range("N" + Line, "N" + Line).Value2.ToString();
-                parDimension = ws.get_Range("O" + Line, "O" + Line).Value2.ToString();
+                if (ws.get_Range("O" + Line, "O" + Line).Value2 != null)
+                { 
+                    parDimension = ws.get_Range("O" + Line, "O" + Line).Value2.ToString();
+                }
+                else
+                {
+                    parDimension = "1x1";
+                }
                 parStatesRow = ws.get_Range("T" + Line, "T" + Line).Value2.ToString();
 
 //                DimDim = parDimension.Length;
@@ -310,8 +317,8 @@ namespace WindowsFormsApplication3
             Var_ScalingID = "    <Var_ScalingID>"+scaling_string+"</Var_ScalingID>";
             Var_Format = "    <Var_Format>"+format_string+"</Var_Format>";
             Var_Unit = "    <Var_Unit>"+P.parUnit+"</Var_Unit>";
-            Var_Min = "    <Var_Min>"+Convert.ToString(P.parMin)+"</Var_Min>";
-            Var_Max = "    <Var_Max>"+Convert.ToString(P.parMax)+"</Var_Max>";
+            Var_Min = "    <Var_Min>"+P.parMin+"</Var_Min>";
+            Var_Max = "    <Var_Max>"+P.parMax+"</Var_Max>";
             Var_MinEdit = "    <Var_MinEdit>"+Convert.ToString(P.parMin)+"</Var_MinEdit>";
             Var_MaxEdit = "    <Var_MaxEdit>"+Convert.ToString(P.parMax)+"</Var_MaxEdit>";
             Exportable = "    <Exportable>true</Exportable>";
@@ -676,10 +683,10 @@ namespace WindowsFormsApplication3
             Var_ScalingID = "    <Var_ScalingID>" + scaling_string + "</Var_ScalingID>";
             Var_Format = "    <Var_Format>" + format_string + "</Var_Format>";
             Var_Unit = "    <Var_Unit>" + P.parUnit + "</Var_Unit>";
-            Var_Min = "    <Var_Min>" + Convert.ToString(P.parMin) + "</Var_Min>";
-            Var_Max = "    <Var_Max>" + Convert.ToString(P.parMax) + "</Var_Max>";
-            Var_MinEdit = "    <Var_MinEdit>" + Convert.ToString(P.parMin) + "</Var_MinEdit>";
-            Var_MaxEdit = "    <Var_MaxEdit>" + Convert.ToString(P.parMax) + "</Var_MaxEdit>";
+            Var_Min = "    <Var_Min>" + P.parMin + "</Var_Min>";
+            Var_Max = "    <Var_Max>" + P.parMax + "</Var_Max>";
+            Var_MinEdit = "    <Var_MinEdit>" + P.parMin + "</Var_MinEdit>";
+            Var_MaxEdit = "    <Var_MaxEdit>" + P.parMax + "</Var_MaxEdit>";
             Var_ReferenceChannel = "    <Var_ReferenceChannel />";
             BreakPoint1_Label = "    <BreakPoint1_Label />";
             BreakPoint1_ScalingID = "    <BreakPoint1_ScalingID />";
@@ -1048,10 +1055,10 @@ namespace WindowsFormsApplication3
             Var_ScalingID = "    <Var_ScalingID>" + scaling_string + "</Var_ScalingID>";
             Var_Format = "    <Var_Format>" + format_string + "</Var_Format>";
             Var_Unit = "    <Var_Unit>" + P.parUnit + "</Var_Unit>";
-            Var_Min = "    <Var_Min>" + Convert.ToString(P.parMin) + "</Var_Min>";
-            Var_Max = "    <Var_Max>" + Convert.ToString(P.parMax) + "</Var_Max>";
-            Var_MinEdit = "    <Var_MinEdit>" + Convert.ToString(P.parMin) + "</Var_MinEdit>";
-            Var_MaxEdit = "    <Var_MaxEdit>" + Convert.ToString(P.parMax) + "</Var_MaxEdit>";
+            Var_Min = "    <Var_Min>" + P.parMin + "</Var_Min>";
+            Var_Max = "    <Var_Max>" + P.parMax + "</Var_Max>";
+            Var_MinEdit = "    <Var_MinEdit>" + P.parMin + "</Var_MinEdit>";
+            Var_MaxEdit = "    <Var_MaxEdit>" + P.parMax + "</Var_MaxEdit>";
             Var_ReferenceChannel = "    <Var_ReferenceChannel />";
             BreakPoint1_Label = "    <BreakPoint1_Label />";
             BreakPoint1_ScalingID = "    <BreakPoint1_ScalingID />";
@@ -1223,6 +1230,7 @@ namespace WindowsFormsApplication3
         internal string NByte;
         internal string NByteSingleValue;
         internal string Signed;
+        internal string Exportable;
         internal string VarNameL0;
         internal string VarNameL1;
         internal string DescL0;
@@ -1260,6 +1268,8 @@ namespace WindowsFormsApplication3
             NByte = "    <NByte>2</NByte>";
             NByteSingleValue = "    <NByteSingleValue>2</NByteSingleValue>";
             Signed = "    <Signed>false</Signed>";
+            Exportable = "< Exportable > true </ Exportable >";
+
             VarNameL0 = "    <VarNameL0>ZZZZZ</VarNameL0>";
             VarNameL1 = "    <VarNameL1>ZZZZZ</VarNameL1>";
             DescL0 = "    <DescL0>rpm threshold above which Engine is On</DescL0>";
@@ -1353,7 +1363,7 @@ namespace WindowsFormsApplication3
 
             //******************************************************
 
-            FactoryName = "    <FactoryName>" + P.parName + "</FactoryName>";
+            FactoryName = "    <FactoryName>" + P.parName + "[0]</FactoryName>";
             CalibrationTypeID = "    <CalibrationTypeID>LIE00</CalibrationTypeID>";
             Address = "    <Address>0x00000000</Address>";
             OffsetByte = "    <OffsetByte>0</OffsetByte>";
@@ -1363,22 +1373,21 @@ namespace WindowsFormsApplication3
             NByte = "    <NByte>" + byte_dim + "</NByte>";
             NByteSingleValue = "    <NByteSingleValue>" + byte_dim_single_value + "</NByteSingleValue>";
             Signed = "    <Signed>" + signed_string + "</Signed>";
-            VarNameL0 = "    <VarNameL0>" + P.parAlias + "</VarNameL0>";
+            Exportable = "    <Exportable>true</Exportable>";
+            VarNameL0 = "    <VarNameL0>" + P.parAlias + "[0]</VarNameL0>";
             VarNameL1 = "    <VarNameL1>" + P.parName + "</VarNameL1>";
             DescL0 = "    <DescL0>" + P.parDescription + "</DescL0>";
             DescL1 = "    <DescL1>" + P.parDescription + "</DescL1>";
-
             BreakPoint1_Label = "    <BreakPoint1_Label>"+P.parInputQuantity+ "</BreakPoint1_Label>";
             BreakPoint1_ScalingID = "    <BreakPoint1_ScalingID>" + scaling_string + "</BreakPoint1_ScalingID>" ;
             BreakPoint1_Format = "    <BreakPoint1_Format>"+ format_string +"</BreakPoint1_Format>";
             BreakPoint1_Unit = "    <BreakPoint1_Unit>" + P.parUnit + "</BreakPoint1_Unit>";
-            BreakPoint1_Min = "    <BreakPoint1_Min>" + Convert.ToString(P.parMin) + "</BreakPoint1_Min>";
-            BreakPoint1_Max = "    <BreakPoint1_Max>" + Convert.ToString(P.parMax) + "</BreakPoint1_Max>";
-            BreakPoint1_MinEdit = "    <BreakPoint1_MinEdit>" + Convert.ToString(P.parMin) + "</BreakPoint1_MinEdit>";
-            BreakPoint1_MaxEdit = "    <BreakPoint1_MaxEdit>" + Convert.ToString(P.parMax) + "</BreakPoint1_MaxEdit>";
+            BreakPoint1_Min = "    <BreakPoint1_Min>" + P.parMin + "</BreakPoint1_Min>";
+            BreakPoint1_Max = "    <BreakPoint1_Max>" + P.parMax + "</BreakPoint1_Max>";
+            BreakPoint1_MinEdit = "    <BreakPoint1_MinEdit>" + P.parMin + "</BreakPoint1_MinEdit>";
+            BreakPoint1_MaxEdit = "    <BreakPoint1_MaxEdit>" + P.parMax + "</BreakPoint1_MaxEdit>";
             BreakPoint1_ReferenceChannel = "    <BreakPoint1_ReferenceChannel>"+P.parInputQuantity+"</BreakPoint1_ReferenceChannel>";
             BreakPoint1_Count = "    <BreakPoint1_Count>"+ Convert.ToString(P.parDim2) +"</BreakPoint1_Count>";
-
             IsArray = "    <IsArray>true</IsArray>";
             UseMaxSize = "    <UseMaxSize>true</UseMaxSize>";
             Validated = "    <Validated>true</Validated>";
@@ -1405,6 +1414,7 @@ namespace WindowsFormsApplication3
             fileXML.WriteLine(NByteSingleValue);
 
             fileXML.WriteLine(Signed);
+            fileXML.WriteLine(Exportable);
             fileXML.WriteLine(VarNameL0);
             fileXML.WriteLine(VarNameL1);
             fileXML.WriteLine(DescL0);

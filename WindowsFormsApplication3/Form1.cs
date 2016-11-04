@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -20,8 +21,10 @@ namespace WindowsFormsApplication3
         string XMLfilePath = @"d:\Software\XML_ECT\LIE00PARTIAL.xml";
         string BasefilePath = @"d:\Software\XML_ECT\LIE00V12BASE.xml";
         string filePathDir = @"d:\Software\XML_ECT";
+        string OBJfilePath = "";
         internal List<Group> GroupList;
         internal List<CalibrationScaling> CScalingList;
+        internal Cont Containr;
 
         public Form1()
         {
@@ -110,6 +113,7 @@ namespace WindowsFormsApplication3
 //            CalibrationScaling CS;
             Group GroupNew = new Group();
 
+
             GroupList = new List<Group>();
             CScalingList = new List<CalibrationScaling>();
 
@@ -176,10 +180,10 @@ namespace WindowsFormsApplication3
 
                     }
 
-                    // If it is a CalibrationValue
+                    // If it is a Signal (Channel in ECT XML nomenclature)
                     if (RetVal == 0)
                     {
-                        SignalValue1.upload(ref XLSECTSignal1, false, 0);
+                        SignalValue1.upload(ref XLSECTSignal1, false, 0, ref Containr);
                         SignalValue1.AppendToFile(ref fileXML);
                         //                        SignalValue1.Show();
                     }
@@ -189,7 +193,7 @@ namespace WindowsFormsApplication3
                         {
                             for (index = 0; index < RetVal; index++)
                             {
-                                SignalValue1.upload(ref XLSECTSignal1, true, index);
+                                SignalValue1.upload(ref XLSECTSignal1, true, index, ref Containr);
                                 SignalValue1.AppendToFile(ref fileXML);
                             }
                         }
@@ -206,7 +210,6 @@ namespace WindowsFormsApplication3
                 {
                     // Elaborate the parameters sheet
                     RetVal = XLSECTParameter1.upload(ref xlWorkSheet_Parameters, Line);
-
 
                     CScalingNew.upload(ref XLSECTParameter1);
                     ScalingExists = false;
@@ -319,6 +322,7 @@ namespace WindowsFormsApplication3
             releaseObject(xlWorkSheet_States);
             releaseObject(xlWorkBook);
             releaseObject(xlApp);
+            MessageBox.Show("Finished!");
 
         }
 
@@ -330,7 +334,6 @@ namespace WindowsFormsApplication3
         private void openFileDialog2_FileOk_1(object sender, CancelEventArgs e)
         {
             filePath = openFileDialog2.FileName;
-//            MessageBox.Show(filePath);
             textBox2.Text = filePath;
             label1.Text = filePath;
         }
@@ -338,10 +341,8 @@ namespace WindowsFormsApplication3
         private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
         {
             XMLfilePath = openFileDialog1.FileName;
-//            MessageBox.Show(filePath);
             textBox1.Text = XMLfilePath;
             label1.Text = filePath;
-
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -353,6 +354,109 @@ namespace WindowsFormsApplication3
         {
             openFileDialog1.InitialDirectory = XMLfilePath;
             openFileDialog1.ShowDialog();
+
+        }
+
+        private void Form1_Load_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            openFileDialog3.InitialDirectory = OBJfilePath;
+            openFileDialog3.ShowDialog();
+        }
+
+        private void textBox3_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void openFileDialog3_FileOk(object sender, CancelEventArgs e)
+        {
+            Process p;
+            ProcessStartInfo p_info;
+
+            //            System.IO.StreamReader fileBase;
+            StreamWriter filedump;
+            StreamWriter filebss;
+            StreamWriter filecalib;
+//            string output = null ;
+            string line = null;
+            StreamReader SR;
+            RawSymbol C;
+            Symbol S;
+            string dumpline;
+
+            Containr = new Cont();
+
+            filedump = new System.IO.StreamWriter(@"d:/tmp/objdump.temp");
+            filebss = new System.IO.StreamWriter(@"d:/tmp/objdump.bss");
+            filecalib = new System.IO.StreamWriter(@"d:/tmp/objdump.calib");
+
+            /* Retrieve filename */
+            OBJfilePath = openFileDialog3.FileName;
+            textBox3.Text = OBJfilePath;
+
+            /* Create symbol tabel using objdump */
+            p = new Process();
+
+            p_info = p.StartInfo;
+            p_info.RedirectStandardOutput = true;
+            p_info.UseShellExecute = false;
+            p_info.FileName = "objdump.exe";
+            p_info.Arguments = "-x " + OBJfilePath;
+
+            p.Start();
+
+            SR = p.StandardOutput;
+            line = SR.ReadLine();
+
+            if (line != null)
+            {
+                do
+                {
+                    line = SR.ReadLine();
+
+                    C = new RawSymbol(ref line);
+                    S = new Symbol(ref C);
+
+                    if (S.section == ".bss")
+                    {
+                        S.section = "bss";
+                        Containr.SymbolBssList.Add(S);
+                        dumpline = S.ConvertToLine();
+                        if (dumpline != null) filebss.WriteLine(dumpline);
+                    }
+                    else if (S.section == ".calibu")
+                    {
+                        S.section = "cal";
+                        Containr.SymbolCalList.Add(S);
+                        dumpline = S.ConvertToLine();
+                        if (dumpline != null) filecalib.WriteLine(dumpline);
+                    }
+
+                    dumpline = S.ConvertToLine();
+                    if (dumpline != null) filedump.WriteLine(dumpline);
+
+                } while (line != null);
+
+            }
+            p.WaitForExit();
+
+            //            MessageBox.Show(output);
+            filedump.Close();
+            filebss.Close();
+            filecalib.Close();
+            MessageBox.Show("Symbol table created");
+
+            Containr.SymbolTableExists = true;
+
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
 
         }
     }

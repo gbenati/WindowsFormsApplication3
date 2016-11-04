@@ -35,8 +35,8 @@ namespace WindowsFormsApplication3
         public Group()
         {
             ID = "    <ID>GROUP_NAME</ID>";
-            VarNameL0 = "    <ID>GROUP_NAME</ID>";
-            VarNameL1 = "    <ID>GROUP_NAME</ID>";
+            VarNameL0 = "    <VarNameL0>GROUP_NAME</VarNameL0>";
+            VarNameL1 = "    <VarNameL1>GROUP_NAME</VarNameL1>";
             DescL0 = "    <DescL0 />";
             DescL1 = "    <DescL1 />";
             Visible = "    <Visible>true</Visible>";
@@ -44,8 +44,8 @@ namespace WindowsFormsApplication3
         public int upload(ref XLSECTSignal P)
         {
             ID = "    <ID>"+P.sigSource + "</ID>";
-            VarNameL0 = "    <ID>"+P.sigSource + "</ID>";
-            VarNameL1 = "    <ID>"+P.sigSource + "</ID>";
+            VarNameL0 = "    <VarNameL0>" + P.sigSource + "</VarNameL0>";
+            VarNameL1 = "    <VarNameL1>" + P.sigSource + "</VarNameL1>";
             DescL0 = "    <DescL0 />";
             DescL1 = "    <DescL1 />";
             Visible = "    <Visible>true</Visible>";
@@ -55,8 +55,8 @@ namespace WindowsFormsApplication3
         public int upload(ref XLSECTParameter P)
         {
             ID = "    <ID>" + P.parSource + "</ID>";
-            VarNameL0 = "    <ID>" + P.parSource + "</ID>";
-            VarNameL1 = "    <ID>" + P.parSource + "</ID>";
+            VarNameL0 = "    <VarNameL0>" + P.parSource + "</VarNameL0>";
+            VarNameL1 = "    <VarNameL1>" + P.parSource + "</VarNameL1>";
             DescL0 = "    <DescL0 />";
             DescL1 = "    <DescL1 />";
             Visible = "    <Visible>true</Visible>";
@@ -186,13 +186,13 @@ namespace WindowsFormsApplication3
         internal string sigType;
         internal int sigDecNum;
         internal string sigUnit;
-        internal int sigMin;
-        internal int sigMax;
-        internal int sigKa;
-        internal int sigKb;
-        internal int sigKc;
-        internal int sigKd;
-        internal int sigKk;
+        internal string sigMin;
+        internal string sigMax;
+        internal string sigKa;
+        internal string sigKb;
+        internal string sigKc;
+        internal string sigKd;
+        internal string sigKk;
         internal string sigAlias;
         internal string sigDescription;
         internal string sigBusType;
@@ -209,13 +209,13 @@ namespace WindowsFormsApplication3
             sigType = "";
             sigDecNum = 0;
             sigUnit = "";
-            sigMin = 0;
-            sigMax = 0;
-            sigKa = 0;
-            sigKb = 0;
-            sigKc = 0;
-            sigKd = 0;
-            sigKk = 0;
+            sigMin = "";
+            sigMax = "";
+            sigKa = "";
+            sigKb = "";
+            sigKc = "";
+            sigKd = "";
+            sigKk = "";
             sigAlias = "";
             sigDescription = "";
             sigBusType = "";
@@ -236,13 +236,13 @@ namespace WindowsFormsApplication3
                 sigType = ws.get_Range("C" + Line, "C" + Line).Value2.ToString();
                 sigDecNum = Convert.ToInt32(ws.get_Range("D" + Line, "D" + Line).Value2.ToString());
                 sigUnit = ws.get_Range("E" + Line, "E" + Line).Value2.ToString();
-                sigMin = Convert.ToInt32(ws.get_Range("F" + Line, "F" + Line).Value2.ToString());
-                sigMax = Convert.ToInt32(ws.get_Range("G" + Line, "G" + Line).Value2.ToString());
-                sigKa = Convert.ToInt32(ws.get_Range("H" + Line, "H" + Line).Value2.ToString());
-                sigKb = Convert.ToInt32(ws.get_Range("I" + Line, "I" + Line).Value2.ToString());
-                sigKc = Convert.ToInt32(ws.get_Range("J" + Line, "J" + Line).Value2.ToString());
-                sigKd = Convert.ToInt32(ws.get_Range("K" + Line, "K" + Line).Value2.ToString());
-                sigKk = Convert.ToInt32(ws.get_Range("L" + Line, "L" + Line).Value2.ToString());
+                sigMin = ws.get_Range("F" + Line, "F" + Line).Value2.ToString();
+                sigMax = ws.get_Range("G" + Line, "G" + Line).Value2.ToString();
+                sigKa = ws.get_Range("H" + Line, "H" + Line).Value2.ToString();
+                sigKb = ws.get_Range("I" + Line, "I" + Line).Value2.ToString();
+                sigKc = ws.get_Range("J" + Line, "J" + Line).Value2.ToString();
+                sigKd = ws.get_Range("K" + Line, "K" + Line).Value2.ToString();
+                sigKk = ws.get_Range("L" + Line, "L" + Line).Value2.ToString();
                 sigAlias = ws.get_Range("M" + Line, "M" + Line).Value2.ToString();
                 sigDescription = ws.get_Range("N" + Line, "N" + Line).Value2.ToString();
                 sigBusType = ws.get_Range("O" + Line, "O" + Line).Value2.ToString();
@@ -351,6 +351,9 @@ namespace WindowsFormsApplication3
         internal string Open;
         internal string ELFVarType;
 
+        /* index */
+
+        static int tab_adr = 0;
         public SignalValue()
         {
             TabAdr = "    <TabAdr>0</TabAdr>";
@@ -387,7 +390,7 @@ namespace WindowsFormsApplication3
             ELFVarType = "    <ELFVarType>1</ELFVarType>";
         }
 
-        public int upload(ref XLSECTSignal P, bool isAnArray, int ind)
+        public int upload(ref XLSECTSignal P, bool isAnArray, int ind, ref Cont Cnr)
         {
             int i;
             string byte_dim = "1";
@@ -395,8 +398,10 @@ namespace WindowsFormsApplication3
             string scaling_string = "S_1_1_0_0_1";
             string format_string = "#######0";
             string type_string = "0";
+            string _name = null;
+            string i_hex;
 
-            scaling_string = "S_1_" + Convert.ToString(P.sigKa) + "_" + Convert.ToString(P.sigKb) + "_" + Convert.ToString(P.sigKc) + "_" + Convert.ToString(P.sigKd);
+            scaling_string = "S_1_" + P.sigKa + "_" + P.sigKb + "_" + P.sigKc + "_" + P.sigKd;
 
             if (P.sigDecNum != 0)
             {
@@ -444,7 +449,9 @@ namespace WindowsFormsApplication3
                     break;
             }
 
-            TabAdr = "    <TabAdr>0</TabAdr>";
+            _name = P.sigName;
+
+            TabAdr = "    <TabAdr>" + Convert.ToString(tab_adr++) + "</TabAdr>";
             FactoryName = "    <FactoryName>" + P.sigName + "</FactoryName>";
             ASAPName = "    <ASAPName>" + P.sigName + "</ASAPName>";
             NByte = "    <NByte>" + byte_dim + "</NByte>";
@@ -456,9 +463,9 @@ namespace WindowsFormsApplication3
             VarNameL1 = "    <VarNameL1>" + P.sigAlias + "</VarNameL1>";
             DescL0 = "    <DescL0>" + P.sigDescription + "</DescL0>";
             DescL1 = "    <DescL1>" + P.sigDescription + "</DescL1>";
-            Address = "    <Address>0x00000000</Address>";
-            MinGraph = "    <MinGraph>" + Convert.ToString(P.sigMin) + "</MinGraph>";
-            MaxGraph = "    <MaxGraph>" + Convert.ToString(P.sigMax) + "</MaxGraph>";
+            Address = "    <Address>0xF1CACAF1</Address>";
+            MinGraph = "    <MinGraph>" + P.sigMin + "</MinGraph>";
+            MaxGraph = "    <MaxGraph>" + P.sigMax + "</MaxGraph>";
             CorrectionType = "    <CorrectionType>0</CorrectionType>";
             LoggerMaxPer = "    <LoggerMaxPer>0</LoggerMaxPer>";
             LoggerNBytes = "    <LoggerNBytes>1</LoggerNBytes>";
@@ -467,8 +474,8 @@ namespace WindowsFormsApplication3
             NByteSingleValue = "    <NByteSingleValue>" + byte_dim + "</NByteSingleValue>";
             Exportable = "    <Exportable>true</Exportable>";
             Channel_ScalingID = "    <Channel_ScalingID>"+scaling_string+"</Channel_ScalingID>";
-            Min = "    <Var_Min>" + Convert.ToString(P.sigMin) + "</Var_Min>";
-            Max = "    <Var_Max>" + Convert.ToString(P.sigMax) + "</Var_Max>";
+            Min = "    <Min>" + P.sigMin + "</Min>";
+            Max = "    <Max>" + P.sigMax + "</Max>";
             Validated = "    <Validated>true</Validated>";
             GroupID = "    <GroupID>" + P.sigSource + "</GroupID>";
             IsArray = "    <IsArray>false</IsArray>";
@@ -484,7 +491,31 @@ namespace WindowsFormsApplication3
                 VarNameL0 = "    <VarNameL0>" + P.sigName + "[" + Convert.ToString(ind) + "]</VarNameL0>";
                 VarNameL1 = "    <VarNameL1>" + P.sigAlias + "[" + Convert.ToString(ind) + "]</VarNameL1>";
                 IsArray = "    <IsArray>true</IsArray>";
-                ELFVarType = "    <ELFVarType>2</ELFVarType>";
+//                ELFVarType = "    <ELFVarType>2</ELFVarType>";
+            }
+
+            if (Cnr.SymbolTableExists == true)
+            {
+                Symbol S = new Symbol();
+                try
+                {
+                    S = Cnr.SymbolBssList.Find(x => x.name == _name);
+                    if (isAnArray)
+                    {
+                        i = Convert.ToInt32(S.address, 16) + ind* Convert.ToInt32(byte_dim);
+                        i_hex = i.ToString("X");
+                        Address = "    <Address>0x" + i_hex + "</Address>";
+                    }
+                    else
+                    {
+                        Address = "    <Address>0x" + S.address + "</Address>";
+                    }
+                }
+                catch
+                {
+                    MessageBox.Show(_name + "doe not exist");
+                }
+//                MessageBox.Show(_name + S.name + S.address);
             }
             return (0);
 
