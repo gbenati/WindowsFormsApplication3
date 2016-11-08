@@ -21,6 +21,8 @@ namespace WindowsFormsApplication3
         string XMLfilePath = @"d:\Software\XML_ECT\LIE00PARTIAL.xml";
         string BasefilePath = @"d:\Software\XML_ECT\LIE00V12BASE.xml";
         string filePathDir = @"d:\Software\XML_ECT";
+        private string A2LfilePath = @"d:\Software\XML_ECT\A2L\LIE00_Partial.a2l";
+        private string A2LINIfilePath = @"d:\Software\XML_ECT\A2L\LIE00.ini";
         string OBJfilePath = "";
         internal List<Group> GroupList;
         internal List<CalibrationScaling> CScalingList;
@@ -85,6 +87,30 @@ namespace WindowsFormsApplication3
             fileXML.Close();
         }
 
+        private void CopyFileAToB(string A, string B)
+        {
+            string line;
+            System.IO.StreamReader fileA;
+            System.IO.StreamWriter fileB;
+
+            fileA = new System.IO.StreamReader(A);
+            fileB = new System.IO.StreamWriter(B, true);
+
+            line = fileA.ReadLine();
+
+            if (line != null)
+            {
+                do
+                {
+                    line = "\t\t" + line;
+                    fileB.WriteLine(line);
+                    line = fileA.ReadLine();
+                } while (line != null);
+            }
+            fileA.Close();
+            fileB.Close();
+        }
+
         private void button4_Click(object sender, EventArgs e)
         {
             Excel.Application xlApp;
@@ -95,7 +121,7 @@ namespace WindowsFormsApplication3
             Excel.Worksheet xlWorkSheet_States;
             string Line;
             int LineNum;
-            int RetVal = 0 ;
+            int RetVal = 0;
             int index;
             bool ScalingExists = false;
             bool GroupExists = false;
@@ -110,7 +136,7 @@ namespace WindowsFormsApplication3
             System.IO.StreamWriter fileXML;
             /* Scaling IDs */
             CalibrationScaling CScalingNew = new CalibrationScaling();
-//            CalibrationScaling CS;
+            //            CalibrationScaling CS;
             Group GroupNew = new Group();
 
 
@@ -252,7 +278,7 @@ namespace WindowsFormsApplication3
                     {
                         CalibrationValue1.upload(ref XLSECTParameter1);
                         CalibrationValue1.AppendToFile(ref fileXML);
-//                        CalibrationValue1.Show();
+                        //                        CalibrationValue1.Show();
                     }
 
                     // If it is a CalibrationSharedAxis
@@ -260,7 +286,7 @@ namespace WindowsFormsApplication3
                     {
                         CalibrationSharedAxis1.upload(ref XLSECTParameter1);
                         CalibrationSharedAxis1.AppendToFile(ref fileXML);
-//                        CalibrationSharedAxis1.Show();
+                        //                        CalibrationSharedAxis1.Show();
                     }
 
                     // If it is a CalibrationCurve
@@ -268,7 +294,7 @@ namespace WindowsFormsApplication3
                     {
                         CalibrationCurve1.upload(ref XLSECTParameter1);
                         CalibrationCurve1.AppendToFile(ref fileXML);
-//                        CalibrationCurve1.Show();
+                        //                        CalibrationCurve1.Show();
                     }
 
                     // If it is a CalibrationMap
@@ -276,7 +302,7 @@ namespace WindowsFormsApplication3
                     {
                         CalibrationMap1.upload(ref XLSECTParameter1);
                         CalibrationMap1.AppendToFile(ref fileXML);
-//                        CalibrationMap1.Show();
+                        //                        CalibrationMap1.Show();
                     }
 
                     LineNum++;
@@ -354,7 +380,6 @@ namespace WindowsFormsApplication3
         {
             openFileDialog1.InitialDirectory = XMLfilePath;
             openFileDialog1.ShowDialog();
-
         }
 
         private void Form1_Load_1(object sender, EventArgs e)
@@ -382,7 +407,7 @@ namespace WindowsFormsApplication3
             StreamWriter filedump;
             StreamWriter filebss;
             StreamWriter filecalib;
-//            string output = null ;
+            //            string output = null ;
             string line = null;
             StreamReader SR;
             RawSymbol C;
@@ -456,6 +481,195 @@ namespace WindowsFormsApplication3
         }
 
         private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label4_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            openFileDialog5.InitialDirectory = A2LINIfilePath;
+            openFileDialog5.ShowDialog();
+        }
+
+        private void textBox4_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            int i;
+            string line;
+            string section;
+            string[] MOD_PARfilePath = new string[0];
+            string[] A2MLfilePath = new string[0];
+            string[] MOD_COMMONfilePath = new string[0];
+            string[] IF_DATAfilePath = new string[0];
+            bool section_done_mod_par = false;
+            bool section_done_a2ml = false;
+            bool section_done_mod_common = false;
+            bool section_done_if_data = false;
+
+            Char[] delimiter = { ';' };
+
+            System.IO.StreamReader fileINI;
+            System.IO.StreamWriter fileA2L;
+
+            Directory.SetCurrentDirectory(Path.GetDirectoryName(A2LfilePath));
+
+            // Generate A2L file
+
+            fileA2L = new System.IO.StreamWriter(A2LfilePath);
+
+            // Generate the header
+            // Write the header to the A2L file
+            line = "/* --------------------------------------------------------*/";
+            fileA2L.WriteLine(line);
+            line = "/* ASAP2 file created by Data Dictionary Wizard            */";
+            fileA2L.WriteLine(line);
+            line = "/* Created: "+DateTime.Now.ToString() + "                            */";
+            fileA2L.WriteLine(line);
+            line = "/* Benati Ltd (C)  2016                                    */";
+            fileA2L.WriteLine(line);
+            line = "/* http://www.benati.co.uk                                 */";
+            fileA2L.WriteLine(line);
+            line = "/* --------------------------------------------------------*/";
+            fileA2L.WriteLine(line);
+            line = " ";
+            fileA2L.WriteLine(line);
+            line = "ASAP2_VERSION 1 51";
+            fileA2L.WriteLine(line);
+            line = "/begin PROJECT LIE00V12AVENTADOR \"E00117 Lamborghini V E0011700\"";
+            fileA2L.WriteLine(line);
+            line = "\t/begin HEADER \"\"";
+            fileA2L.WriteLine(line);
+            line = "\t\tVERSION \"E00117 Lamborghini V E0011700\"";
+            fileA2L.WriteLine(line);
+            line = "\t/end HEADER ";
+            fileA2L.WriteLine(line);
+            line = "\t/begin MODULE E0011700 \"E00117 Lamborghini V E0011700\"";
+            fileA2L.WriteLine(line);
+            line = " ";
+            fileA2L.WriteLine(line);
+
+            // Close the file because it will be reopen later
+            fileA2L.Close();
+
+            // Open INI file, get file names
+
+            fileINI = new System.IO.StreamReader(A2LINIfilePath);
+
+            do
+            {
+                do
+                {
+                    line = fileINI.ReadLine();
+
+                } while (((line != "[MOD_PAR]") && (line != "[A2ML]") && (line != "[MOD_COMMON]") && (line != "[IF_DATA]")) && (false == fileINI.EndOfStream));
+
+                section = line;
+
+                do
+                {
+                    line = fileINI.ReadLine();
+
+                } while (  (false == line.StartsWith("SOURCE=")) 
+                         &&(false == fileINI.EndOfStream)
+                        );
+
+                switch (section)
+                {
+                    case "[MOD_PAR]":
+                        MOD_PARfilePath = line.Substring(7).Split(delimiter, System.StringSplitOptions.RemoveEmptyEntries);
+                        section_done_mod_par = true;
+                        break;
+                    case "[A2ML]":
+                        A2MLfilePath = line.Substring(7).Split(delimiter, System.StringSplitOptions.RemoveEmptyEntries);
+                        section_done_a2ml = true;
+                        break;
+                    case "[MOD_COMMON]":
+                        MOD_COMMONfilePath = line.Substring(7).Split(delimiter, System.StringSplitOptions.RemoveEmptyEntries);
+                        section_done_mod_common = true;
+                        break;
+                    case "[IF_DATA]":
+                        IF_DATAfilePath = line.Substring(7).Split(delimiter, System.StringSplitOptions.RemoveEmptyEntries);
+                        section_done_if_data = true;
+                        break;
+                    default:
+                        break;
+
+                }
+            } while (   (false == section_done_if_data) 
+                     || (false == section_done_mod_common)
+                     || (false == section_done_a2ml)
+                     || (false == section_done_mod_par) );
+#if CAZ
+            if (  (MOD_PARfilePath.Length != 0)
+                && (A2MLfilePath.Length != 0)
+                && (MOD_COMMONfilePath.Length != 0)
+                && (IF_DATAfilePath.Length != 0)
+                )
+            {
+                MessageBox.Show("MOD_PARfilePath = " + MOD_PARfilePath[0] + "\n" + "A2MLfilePath = " + A2MLfilePath[0] + "\n" + "MOD_COMMONfilePath = " + MOD_COMMONfilePath[0] + "\n" + "IF_DATAfilePath = " + IF_DATAfilePath[0] + "\n");
+            }
+#endif
+            // Copy A2ML to the A2L file
+            for (i = 0; i < A2MLfilePath.Length; i++) CopyFileAToB(A2MLfilePath[i], A2LfilePath);
+            // Copy MOD_PAR to the A2L file
+            for (i = 0; i < MOD_PARfilePath.Length; i++) CopyFileAToB(MOD_PARfilePath[i], A2LfilePath);
+            // Copy MOD_COMMON to the A2L file
+            for (i = 0; i < MOD_COMMONfilePath.Length; i++) CopyFileAToB(MOD_COMMONfilePath[i], A2LfilePath);
+            // Copy IF_DATA to the A2L file
+            for (i = 0; i < IF_DATAfilePath.Length; i++) CopyFileAToB(IF_DATAfilePath[i], A2LfilePath);
+
+            // Write footer
+            fileA2L = new System.IO.StreamWriter(A2LfilePath,true); // Append
+
+            // Generate the footer
+            // Write the footer to the A2L file
+            line = "    /end MODULE";
+            fileA2L.WriteLine(line);
+            line = "/end PROJECT";
+            fileA2L.WriteLine(line);
+
+            // Close the file because it will be reopen later
+            fileA2L.Close();
+
+            MessageBox.Show("A2L file generated ");
+        }
+
+        private void openFileDialog4_FileOk(object sender, CancelEventArgs e)
+        {
+            // Store A2L filel name
+            A2LfilePath = openFileDialog4.FileName;
+            textBox4.Text = A2LfilePath;
+        }
+
+        private void label5_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            openFileDialog4.InitialDirectory = A2LfilePath;
+            openFileDialog4.ShowDialog();
+
+        }
+
+        private void openFileDialog5_FileOk(object sender, CancelEventArgs e)
+        {
+            // Store and show A2L INI file name
+            A2LINIfilePath = openFileDialog5.FileName;
+            textBox5.Text = A2LINIfilePath;
+        }
+
+        private void splitContainer1_Panel2_Paint(object sender, PaintEventArgs e)
         {
 
         }
