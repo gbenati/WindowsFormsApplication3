@@ -251,13 +251,16 @@ namespace WindowsFormsApplication3
         internal string ELFVarType;
         internal string Var_FormulaID;
 
-        public int upload(ref XLSECTParameter P)
+
+        public int upload(ref XLSECTParameter P,ref Cont Cnr)
         {
             int i;
             string byte_dim = "1";
             string signed_string = "false";
             string scaling_string = "S_1_1_0_0_1";
             string format_string = "#######0";
+            string _name = null;
+
 
             scaling_string = "S_1_"+Convert.ToString(P.parKa)+"_"+Convert.ToString(P.parKb)+"_"+Convert.ToString(P.parKc)+"_"+Convert.ToString(P.parKd);
             if (P.parDecNum != 0)
@@ -299,6 +302,8 @@ namespace WindowsFormsApplication3
                     signed_string = "false";
                     break;
             }
+            _name = P.parName;
+
             FactoryName = "    <FactoryName>"+P.parName+"</FactoryName>";
             CalibrationTypeID = "    <CalibrationTypeID>LIE00</CalibrationTypeID>";
             Address = "    <Address>0x00000000</Address>";
@@ -330,6 +335,21 @@ namespace WindowsFormsApplication3
             Notes = "    <Notes />";
             ELFVarType = "    <ELFVarType>1</ELFVarType>";
             Var_FormulaID = "    <Var_FormulaID />";
+
+            if (Cnr.SymbolTableExists == true)
+            {
+                Symbol S = new Symbol();
+                try
+                {
+                    S = Cnr.SymbolCalList.Find(x => x.name == _name);
+                    Address = "    <Address>0x" + S.address + "</Address>";
+                }
+                catch
+                {
+                    MessageBox.Show(_name + " does not exist in the symbol table");
+                }
+                //                MessageBox.Show(_name + S.name + S.address);
+            }
 
             return (0);
 
@@ -597,7 +617,7 @@ namespace WindowsFormsApplication3
             Var_FormulaID = "    <Var_FormulaID />";
             BreakPoint1_FormulaID = "    <BreakPoint1_FormulaID />";
         }
-        public int upload(ref XLSECTParameter P)
+        public int upload(ref XLSECTParameter P, ref Cont Cnr)
         {
             int i;
             string byte_dim = "1";
@@ -606,6 +626,7 @@ namespace WindowsFormsApplication3
             string scaling_string = "S_1_1_0_0_1";
             string format_string = "#######0";
             string type_string = "0";
+            string _name = null;
 
             scaling_string = "S_1_" + Convert.ToString(P.parKa) + "_" + Convert.ToString(P.parKb) + "_" + Convert.ToString(P.parKc) + "_" + Convert.ToString(P.parKd);
             if (P.parDecNum != 0)
@@ -662,6 +683,7 @@ namespace WindowsFormsApplication3
                     break;
             }
 
+            _name = P.parName;
             //******************************************************
 
             FactoryName = "    <FactoryName>" + P.parName + "[0]</FactoryName>";
@@ -710,6 +732,20 @@ namespace WindowsFormsApplication3
             Var_IncrementID = "    <Var_IncrementID />";
             Var_FormulaID = "    <Var_FormulaID />";
             BreakPoint1_FormulaID = "    <BreakPoint1_FormulaID />";
+            if (Cnr.SymbolTableExists == true)
+            {
+                Symbol S = new Symbol();
+                try
+                {
+                    S = Cnr.SymbolCalList.Find(x => x.name == _name);
+                    Address = "    <Address>0x" + S.address + "</Address>";
+                }
+                catch
+                {
+                    MessageBox.Show(_name + " does not exist in the Symbol database");
+                }
+                //                MessageBox.Show(_name + S.name + S.address);
+            }
 
             return (0);
 
@@ -969,7 +1005,7 @@ namespace WindowsFormsApplication3
                 BreakPoint2_FormulaID = "    <BreakPoint2_FormulaID />";
 
         }
-        public int upload(ref XLSECTParameter P)
+        public int upload(ref XLSECTParameter P, ref Cont Cnr)
         {
             int i;
             string byte_dim = "1";
@@ -978,6 +1014,7 @@ namespace WindowsFormsApplication3
             string scaling_string = "S_1_1_0_0_1";
             string format_string = "#######0";
             string type_string = "65";
+            string _name = null;
 
             scaling_string = "S_1_" + Convert.ToString(P.parKa) + "_" + Convert.ToString(P.parKb) + "_" + Convert.ToString(P.parKc) + "_" + Convert.ToString(P.parKd);
             if (P.parDecNum != 0)
@@ -1034,6 +1071,7 @@ namespace WindowsFormsApplication3
                     break;
             }
 
+            _name = P.parName;
             //******************************************************
 
             FactoryName = "    <FactoryName>" + P.parName + "[0]</FactoryName>";
@@ -1095,6 +1133,21 @@ namespace WindowsFormsApplication3
             Var_FormulaID = "    <Var_FormulaID />";
             BreakPoint1_FormulaID = "    <BreakPoint1_FormulaID />";
             BreakPoint2_FormulaID = "    <BreakPoint2_FormulaID />";
+
+            if (Cnr.SymbolTableExists == true)
+            {
+                Symbol S = new Symbol();
+                try
+                {
+                    S = Cnr.SymbolCalList.Find(x => x.name == _name);
+                    Address = "    <Address>0x" + S.address + "</Address>";
+                }
+                catch
+                {
+                    MessageBox.Show(_name + " does not exist in the Symbol database");
+                }
+                //                MessageBox.Show(_name + S.name + S.address);
+            }
 
             return (0);
 
@@ -1296,7 +1349,7 @@ namespace WindowsFormsApplication3
             BreakPoint1_FormulaID = "    <BreakPoint1_FormulaID />";
 
         }
-        public int upload(ref XLSECTParameter P)
+        public int upload(ref XLSECTParameter P, ref Cont Cnr)
         {
             int i;
             string byte_dim = "1";
@@ -1305,6 +1358,7 @@ namespace WindowsFormsApplication3
             string scaling_string = "S_1_1_0_0_1";
             string format_string = "#######0";
             string type_string = "61";
+            string _name = null;
 
             scaling_string = "S_1_" + Convert.ToString(P.parKa) + "_" + Convert.ToString(P.parKb) + "_" + Convert.ToString(P.parKc) + "_" + Convert.ToString(P.parKd);
             if (P.parDecNum != 0)
@@ -1361,6 +1415,7 @@ namespace WindowsFormsApplication3
                     break;
             }
 
+            _name = P.parName;
             //******************************************************
 
             FactoryName = "    <FactoryName>" + P.parName + "[0]</FactoryName>";
@@ -1396,6 +1451,21 @@ namespace WindowsFormsApplication3
             BreakPoint1_Monotonicity = "    <BreakPoint1_Monotonicity>1</BreakPoint1_Monotonicity>";
             ELFVarType = "    <ELFVarType>2</ELFVarType>";
             BreakPoint1_FormulaID = "    <BreakPoint1_FormulaID />";
+
+            if (Cnr.SymbolTableExists == true)
+            {
+                Symbol S = new Symbol();
+                try
+                {
+                    S = Cnr.SymbolCalList.Find(x => x.name == _name);
+                    Address = "    <Address>0x" + S.address + "</Address>";
+                }
+                catch
+                {
+                    MessageBox.Show(_name + " does not exist in the Symbol table");
+                }
+                //                MessageBox.Show(_name + S.name + S.address);
+            }
 
             return (0);
 

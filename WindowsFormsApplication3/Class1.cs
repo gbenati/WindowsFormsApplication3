@@ -513,7 +513,7 @@ namespace WindowsFormsApplication3
                 }
                 catch
                 {
-                    MessageBox.Show(_name + "doe not exist");
+                    MessageBox.Show(_name + " does not exist in the symbol table");
                 }
 //                MessageBox.Show(_name + S.name + S.address);
             }

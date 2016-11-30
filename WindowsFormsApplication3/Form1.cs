@@ -15,6 +15,10 @@ using Excel = Microsoft.Office.Interop.Excel;
 
 namespace WindowsFormsApplication3
 {
+    interface IDescriptorEntity<T>
+    {
+        int upload();
+    }
     public partial class Form1 : Form
     {
         string filePath = @"d:\Software\XML_ECT\LIE00_ModelName.xls";
@@ -26,6 +30,8 @@ namespace WindowsFormsApplication3
         string OBJfilePath = "";
         internal List<Group> GroupList;
         internal List<CalibrationScaling> CScalingList;
+        internal List<A2LGroup> A2LGroupList;
+        internal List<Conversion> ConversionList;
         internal Cont Containr;
 
         public Form1()
@@ -276,7 +282,7 @@ namespace WindowsFormsApplication3
                     // If it is a CalibrationValue
                     if (RetVal == 0)
                     {
-                        CalibrationValue1.upload(ref XLSECTParameter1);
+                        CalibrationValue1.upload(ref XLSECTParameter1,ref Containr);
                         CalibrationValue1.AppendToFile(ref fileXML);
                         //                        CalibrationValue1.Show();
                     }
@@ -284,7 +290,7 @@ namespace WindowsFormsApplication3
                     // If it is a CalibrationSharedAxis
                     if (RetVal == 1)
                     {
-                        CalibrationSharedAxis1.upload(ref XLSECTParameter1);
+                        CalibrationSharedAxis1.upload(ref XLSECTParameter1, ref Containr);
                         CalibrationSharedAxis1.AppendToFile(ref fileXML);
                         //                        CalibrationSharedAxis1.Show();
                     }
@@ -292,7 +298,7 @@ namespace WindowsFormsApplication3
                     // If it is a CalibrationCurve
                     if (RetVal == 2)
                     {
-                        CalibrationCurve1.upload(ref XLSECTParameter1);
+                        CalibrationCurve1.upload(ref XLSECTParameter1, ref Containr);
                         CalibrationCurve1.AppendToFile(ref fileXML);
                         //                        CalibrationCurve1.Show();
                     }
@@ -300,7 +306,7 @@ namespace WindowsFormsApplication3
                     // If it is a CalibrationMap
                     if (RetVal == 3)
                     {
-                        CalibrationMap1.upload(ref XLSECTParameter1);
+                        CalibrationMap1.upload(ref XLSECTParameter1, ref Containr);
                         CalibrationMap1.AppendToFile(ref fileXML);
                         //                        CalibrationMap1.Show();
                     }
@@ -501,6 +507,235 @@ namespace WindowsFormsApplication3
 
         }
 
+        private void A2LSymbolsWrite(ref System.IO.StreamWriter fileA2L)
+        {
+            Excel.Application xlApp;
+            Excel.Workbook xlWorkBook;
+            Excel.Worksheet xlWorkSheet_Parameters;
+            Excel.Worksheet xlWorkSheet_Signals;
+            Excel.Worksheet xlWorkSheet_Defines;
+            Excel.Worksheet xlWorkSheet_States;
+            string Line;
+            int LineNum;
+            int RetVal = 0;
+            int index;
+            bool ConvExists = false;
+            bool GroupExists = false;
+
+            XLSECTParameter XLSECTParameter1 = new XLSECTParameter();
+            XLSECTSignal XLSECTSignal1 = new XLSECTSignal();
+
+            Measurement Measurement1 = new Measurement();
+            CharacteristicValue CharacteristicValue1 = new CharacteristicValue();
+            Axis_Pts Axis_Pts1 = new Axis_Pts();
+            CharacteristicCurve CharacteristicCurve1 = new CharacteristicCurve();
+            CharacteristicMap CharacteristicMap1 = new CharacteristicMap();
+            //   CONV
+            Conversion ConversionNew = new Conversion();
+            //   GROUP
+            A2LGroup GroupNew = new A2LGroup();
+
+            A2LGroupList = new List<A2LGroup>();
+            ConversionList = new List<Conversion>();
+
+            object misValue = System.Reflection.Missing.Value;
+
+            xlApp = new Excel.Application();
+            xlWorkBook = xlApp.Workbooks.Open(filePath, 0, true, 5, "", "", true, Microsoft.Office.Interop.Excel.XlPlatform.xlWindows, "\t", false, false, 0, true, 1, 0);
+            xlWorkSheet_Parameters = (Excel.Worksheet)xlWorkBook.Worksheets.get_Item(1);
+            xlWorkSheet_Signals = (Excel.Worksheet)xlWorkBook.Worksheets.get_Item(2);
+            xlWorkSheet_Defines = (Excel.Worksheet)xlWorkBook.Worksheets.get_Item(3);
+            xlWorkSheet_States = (Excel.Worksheet)xlWorkBook.Worksheets.get_Item(4);
+
+            // Generate the signals and write them in the new XML file
+            Line = "2";
+            LineNum = 2;
+
+            // While there are symbols in the Excel sheet
+            while (-2 != RetVal)
+            {
+                // Elaborate the signals sheet
+                RetVal = XLSECTSignal1.upload(ref xlWorkSheet_Signals, Line);
+#if zorro
+                // Build the Scaling IDs list 
+
+                // Create the new COMPU_METHOD
+                ConversionNew.upload(ref XLSECTSignal1);
+                ConvExists = false;
+
+                // Check if it exists already
+                if (CScalingList != null) foreach (CalibrationScaling CS in CScalingList)
+                {
+                    if (CS.ID == ConversionNew.ID)
+                    {
+                        ConvExists = true;
+                    }
+                }
+
+                // If it doesn't exist, add it to the list
+                if (ConvExists == false)
+                {
+                    ConversionList.Add(ConversionNew);
+                    ConversionNew = new Conversion();
+                }
+#endif
+                // Build the Group IDs list 
+
+                // Create the new group
+                GroupNew.upload(ref XLSECTSignal1);
+                GroupExists = false;
+
+                // Check if it exists already
+                foreach (A2LGroup GP in A2LGroupList)
+                {
+                    if (GP.ID == GroupNew.ID)
+                    {
+                        GroupExists = true;
+                    }
+                }
+
+                // If it doesn't exist, add it to the list
+                if (GroupExists == false)
+                {
+                    A2LGroupList.Add(GroupNew);
+                    GroupNew = new A2LGroup();
+                }
+
+                // If it is a Signal (MEASUREMENT in A2L nomenclature)
+                if (RetVal == 0)
+                {
+                    Measurement1.upload(ref XLSECTSignal1, false, 0, ref Containr);
+                    Measurement1.AppendToFile(ref fileA2L);
+                    //                        SignalValue1.Show();
+                }
+                else
+                {
+                    if (RetVal > 1)
+                    {
+                        for (index = 0; index < RetVal; index++)
+                        {
+                            Measurement1.upload(ref XLSECTSignal1, true, index, ref Containr);
+                            Measurement1.AppendToFile(ref fileA2L);
+                        }
+                    }
+                }
+                LineNum++;
+                Line = Convert.ToString(LineNum);
+            }
+
+            // Generate the calibrations and write them in the new XML file
+            Line = "2";
+            LineNum = 2;
+            RetVal = 0;
+            while (-2 != RetVal)
+            {
+                // Elaborate the parameters sheet
+                RetVal = XLSECTParameter1.upload(ref xlWorkSheet_Parameters, Line);
+
+#if NOT_NECESSARY
+
+                CScalingNew.upload(ref XLSECTParameter1);
+                ScalingExists = false;
+
+                foreach (CalibrationScaling CS in CScalingList)
+                {
+                    if (CS.ID == CScalingNew.ID)
+                    {
+                        ScalingExists = true;
+                    }
+                }
+
+                if (ScalingExists == false)
+                {
+                    CScalingList.Add(CScalingNew);
+                    CScalingNew = new CalibrationScaling();
+                }
+#endif
+                // Build the Group IDs list 
+                GroupNew.upload(ref XLSECTParameter1);
+                GroupExists = false;
+
+                foreach (A2LGroup GP in A2LGroupList)
+                {
+                    if (GP.ID == GroupNew.ID)
+                    {
+                        GroupExists = true;
+                    }
+                }
+
+                if (GroupExists == false)
+                {
+                    A2LGroupList.Add(GroupNew);
+                    GroupNew = new A2LGroup();
+
+                }
+
+                // If it is a CalibrationValue
+                if (RetVal == 0)
+                {
+                    CharacteristicValue1.upload(ref XLSECTParameter1, ref Containr);
+                    CharacteristicValue1.AppendToFile(ref fileA2L);
+                    //                        CalibrationValue1.Show();
+                }
+#if AL_FAG_PO_DOP
+
+                // If it is a CalibrationSharedAxis
+                if (RetVal == 1)
+                {
+                    CalibrationSharedAxis1.upload(ref XLSECTParameter1);
+                    CalibrationSharedAxis1.AppendToFile(ref fileXML);
+                    //                        CalibrationSharedAxis1.Show();
+                }
+
+                // If it is a CalibrationCurve
+                if (RetVal == 2)
+                {
+                    CalibrationCurve1.upload(ref XLSECTParameter1);
+                    CalibrationCurve1.AppendToFile(ref fileXML);
+                    //                        CalibrationCurve1.Show();
+                }
+
+                // If it is a CalibrationMap
+                if (RetVal == 3)
+                {
+                    CalibrationMap1.upload(ref XLSECTParameter1);
+                    CalibrationMap1.AppendToFile(ref fileXML);
+                    //                        CalibrationMap1.Show();
+                }
+#endif
+
+                LineNum++;
+                Line = Convert.ToString(LineNum);
+            }
+
+            if (GroupList != null) foreach (Group GP in GroupList)
+            {
+                GP.AppendToFile(ref fileA2L);
+            }
+
+#if NOT_NECESSARY
+            foreach (CalibrationScaling CS in CScalingList)
+            {
+                CS.AppendToFile(ref fileXML);
+            }
+
+            fileXML.WriteLine("</LIE00V12PARTIAL>");
+            fileXML.Close();
+#endif
+
+
+            xlWorkBook.Close(true, misValue, misValue);
+            xlApp.Quit();
+
+            releaseObject(xlWorkSheet_Parameters);
+            releaseObject(xlWorkSheet_Signals);
+            releaseObject(xlWorkSheet_Defines);
+            releaseObject(xlWorkSheet_States);
+            releaseObject(xlWorkBook);
+            releaseObject(xlApp);
+
+        }
+
         private void button6_Click(object sender, EventArgs e)
         {
             int i;
@@ -532,7 +767,7 @@ namespace WindowsFormsApplication3
             fileA2L.WriteLine(line);
             line = "/* ASAP2 file created by Data Dictionary Wizard            */";
             fileA2L.WriteLine(line);
-            line = "/* Created: "+DateTime.Now.ToString() + "                            */";
+            line = "/* Created: " + DateTime.Now.ToString() + "                            */";
             fileA2L.WriteLine(line);
             line = "/* Benati Ltd (C)  2016                                    */";
             fileA2L.WriteLine(line);
@@ -578,8 +813,8 @@ namespace WindowsFormsApplication3
                 {
                     line = fileINI.ReadLine();
 
-                } while (  (false == line.StartsWith("SOURCE=")) 
-                         &&(false == fileINI.EndOfStream)
+                } while ((false == line.StartsWith("SOURCE="))
+                         && (false == fileINI.EndOfStream)
                         );
 
                 switch (section)
@@ -604,10 +839,10 @@ namespace WindowsFormsApplication3
                         break;
 
                 }
-            } while (   (false == section_done_if_data) 
+            } while ((false == section_done_if_data)
                      || (false == section_done_mod_common)
                      || (false == section_done_a2ml)
-                     || (false == section_done_mod_par) );
+                     || (false == section_done_mod_par));
 #if CAZ
             if (  (MOD_PARfilePath.Length != 0)
                 && (A2MLfilePath.Length != 0)
@@ -627,8 +862,12 @@ namespace WindowsFormsApplication3
             // Copy IF_DATA to the A2L file
             for (i = 0; i < IF_DATAfilePath.Length; i++) CopyFileAToB(IF_DATAfilePath[i], A2LfilePath);
 
+            fileA2L = new System.IO.StreamWriter(A2LfilePath, true); // Append
+
+            // Generate and write every entity in the A2L file
+            A2LSymbolsWrite(ref fileA2L);
+
             // Write footer
-            fileA2L = new System.IO.StreamWriter(A2LfilePath,true); // Append
 
             // Generate the footer
             // Write the footer to the A2L file
@@ -675,3 +914,4 @@ namespace WindowsFormsApplication3
         }
     }
 }
+
