@@ -17,6 +17,7 @@ namespace WindowsFormsApplication3
     public class XLSECTParameter
     {
         internal string parName;
+        internal char parCalType;
         internal string parSource;
         internal string parType;
         internal int parDecNum;
@@ -41,6 +42,7 @@ namespace WindowsFormsApplication3
         public XLSECTParameter()
         {
             parName = "";
+            parCalType = 'Z';
             parSource = "";
             parType = "";
             parDecNum = 0;
@@ -75,6 +77,8 @@ namespace WindowsFormsApplication3
             {
                 /* Common to all types of paramteters */
                 parName = ws.get_Range("A" + Line, "A" + Line).Value2.ToString();
+                parCalType = parName[parName.Length - 1];
+                if (parCalType == 'k') parCalType = 'B';
                 parSource = ws.get_Range("B" + Line, "B" + Line).Value2.ToString();
                 parType = ws.get_Range("C" + Line, "C" + Line).Value2.ToString();
                 parDecNum = Convert.ToInt32(ws.get_Range("D" + Line, "D" + Line).Value2.ToString());
@@ -141,19 +145,82 @@ namespace WindowsFormsApplication3
                 }
                 else
                 {
-                    /* Shared axis */
+                    /* Shared axis or map/curve without axes */
                     if (ws.get_Range("P" + Line, "P" + Line).Value2 == null)
                     {
-                        if (ws.get_Range("S" + Line, "S" + Line).Value2 != null)
+                        if (ws.get_Range("S" + Line, "S" + Line).Value2 != null)   /* Shared axis */
                         {
-                            parInputQuantity = ws.get_Range("S" + Line, "S" + Line).Value2.ToString();
+                            if (parCalType == 'B')
+                            { 
+                                parInputQuantity = ws.get_Range("S" + Line, "S" + Line).Value2.ToString();
+                                return (1); // Shared axis = 1
+                            }
+                            else
+                            {
+                                return (-1); /* Discrepancy beetween parCalType and no parInputQuantity */
+                            }
+
                         }
                         else
                         {
-                            return (-1);
+                            /* VAL_BLK array or matrix */
+                            if (parDim1 == 1)
+                            {
+                                if ((ws.get_Range("S" + Line, "S" + Line).Value2 == "NONE")
+                                    || (ws.get_Range("S" + Line, "S" + Line).Value2 == "none")
+                                    || (ws.get_Range("S" + Line, "S" + Line).Value2 == "None")
+                                   )
+                                {
+                                    if ((parCalType == 'V') || (parCalType == 'C'))
+                                    { 
+                                        return (4);  /* VAL_BLK array */
+                                    }
+                                    else
+                                    {
+                                        return (-1); /* Discrepancy beetween parCalType and VAL_BLK array without axes */
+                                    }
+                                }
+                                else
+                                {
+                                    if (parCalType == 'V')
+                                    {
+                                        return (5);  /* CURVE with embedded fixed axis */
+                                    }
+                                    else
+                                    {
+                                        return (-1); /* Discrepancy beetween parCalType and CURVE with embedded axes */
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if ((ws.get_Range("S" + Line, "S" + Line).Value2 == "NONE")
+                                    || (ws.get_Range("S" + Line, "S" + Line).Value2 == "none")
+                                    || (ws.get_Range("S" + Line, "S" + Line).Value2 == "None")
+                                   )
+                                {
+                                    if ((parCalType == 'T') || (parCalType == 'C'))
+                                    {
+                                        return (6);  /* VAL_BLK 2 dim matrix */
+                                    }
+                                    else
+                                    {
+                                        return (-1); /* Discrepancy beetween parCalType and VAL_BLK matrix without axes */
+                                    }
+                                }
+                                else
+                                {
+                                    if (parCalType == 'T')
+                                    {
+                                        return (7);  /* MAP with embedded fixed axes */
+                                    }
+                                    else
+                                    {
+                                        return (-1); /* Discrepancy beetween parCalType and MAP with embedded fixed axes */
+                                    }
+                                }
+                            }
                         }
-
-                        return (1); // Shared axis = 1
                     }
                     else
                     {
@@ -163,17 +230,15 @@ namespace WindowsFormsApplication3
                         if (ws.get_Range("Q" + Line, "Q" + Line).Value2 != null)
                         {
                             parBreakpoint2 = ws.get_Range("Q" + Line, "Q" + Line).Value2.ToString();
-                            return (3); // 2-DIM Interpolation map = 3 
+                            return (3); // 2-DIM Interpolation map with shared axes = 3
                         }
                         else
                         {
                             /* There is no breakpoint 2 => it's a 1-DIM table */
-                            return (2); // 1-DIM Interpolation map = 2 
+                            return (2); // 1-DIM Interpolation map with shared axes = 2
 
-                        }
-                    
+                        }                    
                     }
-//                    return (-1);
                 }
             }
             else

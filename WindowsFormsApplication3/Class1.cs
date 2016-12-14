@@ -267,6 +267,17 @@ namespace WindowsFormsApplication3
                         return (sigDim);
                     }
                 }
+                else if (sigBusType == "I")
+                {
+                    if (sigDim < 2)
+                    {
+                        return (0);
+                    }
+                    else
+                    {
+                        return (sigDim + 123456789);
+                    }
+                }
                 else
                 {
                     return (-1);

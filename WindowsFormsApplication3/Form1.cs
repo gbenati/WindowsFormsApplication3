@@ -213,7 +213,7 @@ namespace WindowsFormsApplication3
                     }
 
                     // If it is a Signal (Channel in ECT XML nomenclature)
-                    if (RetVal == 0)
+                    if ((RetVal == 0) || (RetVal == 123456789))
                     {
                         SignalValue1.upload(ref XLSECTSignal1, false, 0, ref Containr);
                         SignalValue1.AppendToFile(ref fileXML);
@@ -223,6 +223,10 @@ namespace WindowsFormsApplication3
                     {
                         if (RetVal > 1)
                         {
+                            if (RetVal > 123456789)
+                            {
+                                RetVal -= 123456789;
+                            }
                             for (index = 0; index < RetVal; index++)
                             {
                                 SignalValue1.upload(ref XLSECTSignal1, true, index, ref Containr);
@@ -602,7 +606,7 @@ namespace WindowsFormsApplication3
                 }
 
                 // If it is a Signal (MEASUREMENT in A2L nomenclature)
-                if (RetVal == 0)
+                if ((RetVal == 0) || (RetVal == 123456789))
                 {
                     Measurement1.upload(ref XLSECTSignal1, false, 0, ref Containr);
                     Measurement1.AppendToFile(ref fileA2L);
@@ -612,6 +616,10 @@ namespace WindowsFormsApplication3
                 {
                     if (RetVal > 1)
                     {
+                        if (RetVal > 123456789)
+                        {
+                            RetVal -= 123456789;
+                        }
                         for (index = 0; index < RetVal; index++)
                         {
                             Measurement1.upload(ref XLSECTSignal1, true, index, ref Containr);
@@ -677,32 +685,33 @@ namespace WindowsFormsApplication3
                     CharacteristicValue1.AppendToFile(ref fileA2L);
                     //                        CalibrationValue1.Show();
                 }
-#if AL_FAG_PO_DOP
 
                 // If it is a CalibrationSharedAxis
                 if (RetVal == 1)
                 {
-                    CalibrationSharedAxis1.upload(ref XLSECTParameter1);
-                    CalibrationSharedAxis1.AppendToFile(ref fileXML);
+                    Axis_Pts1.upload(ref XLSECTParameter1, ref Containr);
+                    Axis_Pts1.AppendToFile(ref fileA2L);
                     //                        CalibrationSharedAxis1.Show();
                 }
 
                 // If it is a CalibrationCurve
                 if (RetVal == 2)
                 {
-                    CalibrationCurve1.upload(ref XLSECTParameter1);
-                    CalibrationCurve1.AppendToFile(ref fileXML);
+                    CharacteristicCurve1.upload(ref XLSECTParameter1, ref Containr);
+                    CharacteristicCurve1.AppendToFile(ref fileA2L);
                     //                        CalibrationCurve1.Show();
                 }
 
                 // If it is a CalibrationMap
                 if (RetVal == 3)
                 {
-                    CalibrationMap1.upload(ref XLSECTParameter1);
-                    CalibrationMap1.AppendToFile(ref fileXML);
+                    CharacteristicMap1.upload(ref XLSECTParameter1, ref Containr);
+                    CharacteristicMap1.AppendToFile(ref fileA2L);
                     //                        CalibrationMap1.Show();
                 }
-#endif
+
+                // Copy record layouts
+
 
                 LineNum++;
                 Line = Convert.ToString(LineNum);
@@ -745,10 +754,12 @@ namespace WindowsFormsApplication3
             string[] A2MLfilePath = new string[0];
             string[] MOD_COMMONfilePath = new string[0];
             string[] IF_DATAfilePath = new string[0];
+            string[] R_LayoutfilePath = new string[0];
             bool section_done_mod_par = false;
             bool section_done_a2ml = false;
             bool section_done_mod_common = false;
             bool section_done_if_data = false;
+            bool section_done_record_layout = false;
 
             Char[] delimiter = { ';' };
 
@@ -805,7 +816,7 @@ namespace WindowsFormsApplication3
                 {
                     line = fileINI.ReadLine();
 
-                } while (((line != "[MOD_PAR]") && (line != "[A2ML]") && (line != "[MOD_COMMON]") && (line != "[IF_DATA]")) && (false == fileINI.EndOfStream));
+                } while (((line != "[MOD_PAR]") && (line != "[A2ML]") && (line != "[MOD_COMMON]") && (line != "[IF_DATA]") && (line != "[RECORD_LAYOUT]")) && (false == fileINI.EndOfStream));
 
                 section = line;
 
@@ -835,14 +846,20 @@ namespace WindowsFormsApplication3
                         IF_DATAfilePath = line.Substring(7).Split(delimiter, System.StringSplitOptions.RemoveEmptyEntries);
                         section_done_if_data = true;
                         break;
+                    case "[RECORD_LAYOUT]":
+                        R_LayoutfilePath = line.Substring(7).Split(delimiter, System.StringSplitOptions.RemoveEmptyEntries);
+                        section_done_record_layout = true;
+                        break;
                     default:
                         break;
 
                 }
-            } while ((false == section_done_if_data)
+            } while (   (false == section_done_if_data)
                      || (false == section_done_mod_common)
                      || (false == section_done_a2ml)
-                     || (false == section_done_mod_par));
+                     || (false == section_done_mod_par)
+                     || (false == section_done_record_layout)
+                    );
 #if CAZ
             if (  (MOD_PARfilePath.Length != 0)
                 && (A2MLfilePath.Length != 0)
@@ -861,6 +878,8 @@ namespace WindowsFormsApplication3
             for (i = 0; i < MOD_COMMONfilePath.Length; i++) CopyFileAToB(MOD_COMMONfilePath[i], A2LfilePath);
             // Copy IF_DATA to the A2L file
             for (i = 0; i < IF_DATAfilePath.Length; i++) CopyFileAToB(IF_DATAfilePath[i], A2LfilePath);
+            // Copy RECORD_LAYOUT to the A2L file
+            for (i = 0; i < R_LayoutfilePath.Length; i++) CopyFileAToB(R_LayoutfilePath[i], A2LfilePath);
 
             fileA2L = new System.IO.StreamWriter(A2LfilePath, true); // Append
 
