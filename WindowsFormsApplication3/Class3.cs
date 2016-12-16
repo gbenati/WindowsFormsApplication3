@@ -16,18 +16,78 @@ namespace WindowsFormsApplication3
         public A2LGroup()
         {
             ID = "";
+            MeasurementList = new List<string>();
+            CharacteristicList = new List<string>();
         }
         public int upload(ref XLSECTSignal P)
         {
+            ID = P.sigSource;
             return (0);
         }
         public int upload(ref XLSECTParameter P)
         {
+            ID = P.parSource;
             return (0);
         }
+        public int Add(ref XLSECTSignal P)
+        {
+            if (null != P.sigName)
+            {
+                MeasurementList.Add(P.sigName);
+            }
+            return (0);
+        }
+        public int Add(ref XLSECTSignal P, int index)
+        {
+            if (null != P.sigName)
+            {
+                MeasurementList.Add(P.sigName +"[" +Convert.ToString(index)+"]");
+            }
+            return (0);
+        }
+        public int Add(ref XLSECTParameter P)
+        {
+            if (null != P.parName)
+            {
+                CharacteristicList.Add(P.parName);
+            }
+            return (0);
+        }
+        public int Add(ref XLSECTParameter P, bool isArray)
+        {
+            if (null != P.parName)
+            {
+                CharacteristicList.Add(P.parName + "[0]");
+            }
+            return (0);
+        }
+        public int AppendToFile(ref System.IO.StreamWriter file)
+        {
+            string spacing = "          ";
+            string spacing2 = "                ";
+            string spacing3 = "                      ";
 
+            /* Write the group  */
+            file.WriteLine(spacing + "/begin GROUP " + ID + " \""+ID+"\"");
+
+            file.WriteLine(spacing2 + "/begin REF_CHARACTERISTIC");
+            foreach (string name in CharacteristicList)
+            {
+                file.WriteLine(spacing3+name);
+            }
+            file.WriteLine(spacing2 + "/end REF_CHARACTERISTIC");
+
+            file.WriteLine(spacing2 + "/begin REF_MEASUREMENT");
+            foreach (string name in MeasurementList)
+            {
+                file.WriteLine(spacing3+name);
+            }
+            file.WriteLine(spacing2 + "/end REF_MEASUREMENT");
+            file.WriteLine(spacing + "/end GROUP ");
+            return (0);
+        }
     }
-    public sealed class AxisDescr
+        public sealed class AxisDescr
     {
         internal string Attribute;
         internal string InputQuantity;
@@ -381,6 +441,7 @@ namespace WindowsFormsApplication3
                         ecu_address = "ECU_ADDRESS 0x" + i_hex;
                         base_address = "0x" + i_hex;
                         asap1b_ccp = "KP_BLOB 0x0 0x" + i_hex + " " + byte_dim;
+                        link_map = "LINK_MAP " + _name+"._" + Convert.ToString(ind) +"_";
 
 
                     }

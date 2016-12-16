@@ -72,6 +72,8 @@
             this.label7 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
+            this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+            this.selectBaseDirToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -332,6 +334,7 @@
             this.menuStrip1.Size = new System.Drawing.Size(556, 24);
             this.menuStrip1.TabIndex = 21;
             this.menuStrip1.Text = "menuStrip1";
+            this.menuStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.menuStrip1_ItemClicked);
             // 
             // fileToolStripMenuItem
             // 
@@ -340,7 +343,8 @@
             this.eLFFileToolStripMenuItem,
             this.xMLFileToolStripMenuItem,
             this.a2LINIFileToolStripMenuItem,
-            this.a2lFileToolStripMenuItem});
+            this.a2lFileToolStripMenuItem,
+            this.selectBaseDirToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
@@ -415,13 +419,13 @@
             // helpToolStripMenuItem1
             // 
             this.helpToolStripMenuItem1.Name = "helpToolStripMenuItem1";
-            this.helpToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.helpToolStripMenuItem1.Size = new System.Drawing.Size(107, 22);
             this.helpToolStripMenuItem1.Text = "Help";
             // 
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this.aboutToolStripMenuItem.Text = "About";
             // 
             // openFileDialog5
@@ -470,6 +474,18 @@
             this.label9.Size = new System.Drawing.Size(136, 16);
             this.label9.TabIndex = 25;
             this.label9.Text = "Original Excel section";
+            // 
+            // folderBrowserDialog1
+            // 
+            this.folderBrowserDialog1.SelectedPath = "d:\\Software";
+            this.folderBrowserDialog1.HelpRequest += new System.EventHandler(this.folderBrowserDialog1_HelpRequest);
+            // 
+            // selectBaseDirToolStripMenuItem
+            // 
+            this.selectBaseDirToolStripMenuItem.Name = "selectBaseDirToolStripMenuItem";
+            this.selectBaseDirToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
+            this.selectBaseDirToolStripMenuItem.Text = "Select base dir";
+            this.selectBaseDirToolStripMenuItem.Click += new System.EventHandler(this.selectBaseDirToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -551,6 +567,8 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
+        private System.Windows.Forms.ToolStripMenuItem selectBaseDirToolStripMenuItem;
     }
 }
 
